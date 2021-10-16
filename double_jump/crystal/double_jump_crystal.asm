@@ -16,6 +16,17 @@ lw s0, 0xB1F8(s0)
 lui s1, 0x8036
 lw s1, 0x1160(s1)
 
+; Rotate object model
+; Load current faceYaw
+; oFaceAngleYaw offset relative to curObj = 0x0D4
+lw t0, 0x0D4(s1)
+; Add 0x00020000
+; lui t1, 0x0002
+ori t1, r0, 0x0200
+addu t0, t0, t1
+; Store back the value
+sw t0, 0x0D4(s1)
+
 ; Check if object is active
 ; unused2 field has offset 0x210
 lw t0, 0x210(s1)
@@ -26,10 +37,10 @@ beq t0, r0, active
 andi t1, t0, 0x0003
 bne t1, r0, noParticles
 ori a0, r0, 1
-ori a1, r0, 1
-ori a2, r0, 1
+ori a1, r0, 2
+ori a2, r0, 70
 jal 0x802B2BC8
-ori a3, r0, -60
+ori a3, r0, -100
 
 noParticles:
 
@@ -96,22 +107,17 @@ sh t0, 0x02(s1)
 ori t0, r0, 0x003C
 sw t0, 0x210(s1)
 
-; Play sound
-; arg0 is the sound ID (SOUND_GENERAL_WALL_EXPLOSION = 0x500CA080)
-; Call to cur_obj_play_sound_2 (0x802CA1E0)
-lui a0, 0x500D
-jal 0x802CA1E0
-addiu a0, a0, 0xA080
+; Play sound effect
+; arg0 is the sound ID (SOUND_MENU_STAR_SOUND = 0x701EFF80)
+; arg1 is a pointer to the sound source position (&gGlobalSoundSource = 0x803331F0)
+; Call to play_sound (0x8031EB00)
+lui a0, 0x701E
+ori a0, a0, 0xFF81
+lui a1, 0x8033
+jal 0x8031EB00
+addiu a1, a1, 0x31F0
 
 noCollision:
-
-; Load current faceYaw
-; &curObject.oFaceAngleYaw = 0x80361160 + 0x118 = 0x80361278
-;lw t0, 0x1278(t7)
-; Add 0xFF00
-;addiu t0, t0, 0xFF00
-; Store back the value
-;sw t0, 0x1278(t7)
 
 ; --Function-wrapper-end----
 lw s1, 0x0C(sp)
