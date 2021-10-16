@@ -20,12 +20,34 @@ lw s1, 0x1160(s1)
 ; Load current faceYaw
 ; oFaceAngleYaw offset relative to curObj = 0x0D4
 lw t0, 0x0D4(s1)
-; Add 0x00020000
-; lui t1, 0x0002
+; Add a constant angle
 ori t1, r0, 0x0200
 addu t0, t0, t1
 ; Store back the value
 sw t0, 0x0D4(s1)
+
+; Add sine wave offset in the Y position
+; Load oTimer (offset 0x154) and convert into a float
+lw t0, 0x154(s1)
+mtc1 t0, f12
+cvt.s.w f12, f12
+; Multiply by the pulsation of the oscillation
+; pulsation = 2 pi / period
+ori t0, r0, 15 ; 1 / pulsation
+mtc1 t0, f1
+cvt.s.w f1, f1
+; Compute the sine
+; Call to sinf (0x80325480)
+; arg1 into f12 and result into f0
+jal 0x80325480
+div.s f12, f12, f1 ; sine input = pulsation * t
+; Multiply by the amplitude
+ori t0, r0, 10 ; Amplitude
+mtc1 t0, f1
+cvt.s.w f1, f1
+mul.s f0, f0, f1
+; Store to oGraphYOffset (offset 0x0DC)
+swc1 f0, 0x0DC(s1)
 
 ; Check if object is active
 ; unused2 field has offset 0x210
@@ -33,7 +55,7 @@ lw t0, 0x210(s1)
 beq t0, r0, active
 
 ; Spawn particles every 4 frames
-; spawn_sparkle_particles(1, 1, 1, -60)
+; spawn_sparkle_particles(1, 2, 70, -100)
 andi t1, t0, 0x0003
 bne t1, r0, noParticles
 ori a0, r0, 1
