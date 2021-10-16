@@ -1,0 +1,31 @@
+# Alias Wavefront MTL File Exported from SketchUp
+# with OBJexporter (c) 2013 TIG
+# Made for 'crystal.obj'
+
+newmtl Default_Material
+Ka 1 1 1
+Kd 1 1 1
+Ks 0.333 0.333 0.333
+Ns 0
+d 1
+Tr 1
+
+newmtl crystal
+Ka 0.101961 0.843137 0.0784314
+Kd 0.101961 0.843137 0.0784314
+Ks 0.333 0.333 0.333
+Ns 0
+d 1
+Tr 1
+map_Kd crystal_Textures/crystal.PNG
+
+newmtl crystal_transparent
+Ka 0.101961 0.843137 0.0784314
+Kd 0.101961 0.843137 0.0784314
+Ks 0.333 0.333 0.333
+Ns 0
+d 0.5
+Tr 0.5
+map_Kd crystal_Textures/crystal_transparent.PNG
+
+#EOF
