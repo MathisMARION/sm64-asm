@@ -38,7 +38,7 @@ mtc1 t0, f1
 cvt.s.w f1, f1
 ; Compute the sine
 ; Call to sinf (0x80325480)
-; arg1 into f12 and result into f0
+; arg0 into f12 and result into f0
 jal 0x80325480
 div.s f12, f12, f1 ; sine input = pulsation * t
 ; Multiply by the amplitude
@@ -49,7 +49,7 @@ mul.s f0, f0, f1
 ; Store to oGraphYOffset (offset 0x0DC)
 swc1 f0, 0x0DC(s1)
 
-; Check if object is active
+; Check if object is active (counter strored in curObj.unused2 == 0)
 ; unused2 field has offset 0x210
 lw t0, 0x210(s1)
 beq t0, r0, active
@@ -66,7 +66,7 @@ ori a3, r0, -100
 
 noParticles:
 
-; Decrement counter
+; Decrement counter stored in curObj.usused2 (offset 0x210)
 lw t0, 0x210(s1)
 addi t0, t0, 0xFFFF
 bne t0, r0, noCollision
@@ -87,14 +87,15 @@ active:
 ; Check for collision
 ; arg1 is a pointer to the Mario Object struct
 ; arg2 is a pointer to the current object (stored at 0x80361160)
+; Call to obj_check_if_collided_with_object (0x802A1424)
 ori a0, s1, 0
 jal 0x802A1424
 ori a1, s0, 0
 beq v0, r0, noCollision
 nop
 
-; Save 1 to an unused field of the Mario Object struct
-; unused2 field has offset 0x210
+; Save 1 to marioObj.unused2 (offset 0x210)
+; to give back the double jump ability
 ori t1, r0, 1
 sb t1, 0x210(s0)
 
@@ -109,7 +110,7 @@ lui a1, 0x0100
 jal 0x80252CF4
 addiu a1, a1, 0x088C
 
-; Set Mario's animation to double jump
+; Set Mario's animation to falling
 ; arg0 is a pointer to the Mario struct (0x8033B170)
 ; arg1 is the annimation ID (MARIO_ANIM_GENERAL_FALL = 0x56)
 lui a0, 0x8034
@@ -125,8 +126,9 @@ lh t0, 0x02(s1)
 andi t0, t0, 0xFFFE
 sh t0, 0x02(s1)
 
-; Set counter to 0x3C = 60 frames = 2s
-ori t0, r0, 0x003C
+; Set cooldown counter
+; Counter is stored in curObj.unused2 (offset 0x210)
+ori t0, r0, 60 ; 60 frames = 2s
 sw t0, 0x210(s1)
 
 ; Play sound effect

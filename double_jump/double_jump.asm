@@ -42,15 +42,15 @@ sw t0, 0xEC6C(t5)
 sw t0, 0xEC70(t5)
 sw t0, 0xEC74(t5)
 
-; Save 1 to an unused field of the Mario Object struct
-; unused2 field has offset 0x210
+; Save 1 to marioObj.unused2 (offset 0x210)
+; to enable the double jump ability
 ori t1, r0, 1
 beq r0, r0, skip
 sb t1, 0x210(t7)
 
 airborne:
 
-; Check if midair jump is available (check curObject.unused1)
+; Check if midair jump is available (marioObj.unused2 == 1)
 lb t0, 0x210(t7)
 beq t0, r0, skip
 
@@ -127,7 +127,8 @@ andi t0, t0, 0x8000
 beq t0, r0, skip
 nop
 
-; Save 0 to an unused field of the Mario Object struct
+; Save 0 to marioObj.unused2 (offset 0x210)
+; to disable the double jump ability
 sh r0, 0x210(t7)
 
 ; Set Mario's shoe color to default
