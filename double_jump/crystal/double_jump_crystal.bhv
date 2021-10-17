@@ -1,0 +1,8 @@
+00 04 00 00 // Start behavior (object type 0x04 for regular enemies/objects)
+11 01 00 01 // Set update flag
+10 05 00 00 // Enable Mario interaction
+10 2B 00 00 // Enable general interaction
+23 00 00 00 00 50 00 64 // Set collision cylinder
+08 00 00 00 // Start loop
+0C 00 00 00 80 40 61 4C // Call custom ASM function
+09 00 00 00 // End loop
