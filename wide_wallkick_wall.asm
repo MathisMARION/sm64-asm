@@ -29,16 +29,16 @@ SURFACE_WIDE_WALLKICK equ 0x00000003
 ; The flag set isn't used anywhere else so we can get rid of it.
 ; t6 contains m->wall->type from previous instructions so it can be reused.
 ; We want to replace the condition with:
-; if (abs(wallDYaw) > 0x6000 - 0x0010 * (m->wall->type == SURFACE_WIDE_WALLKICK))
+; if (abs(wallDYaw) > (m->wall->type == SURFACE_WIDE_WALLKICK) ? 0x6000 : 0x4000)
 
 lh t0, 0x004E(sp)                 ; +
 bgtz t0, @positive_angle          ; |
 ori t1, r0, SURFACE_WIDE_WALLKICK ; |
 sub t0, r0, t0                    ; | t0 = abs(wallDYaw)
-@positive_angle:                  ; | t2 = 0x6001 - (m->wall->type == SURFACE_WIDE_WALLKICK)
+@positive_angle:                  ; | t2 = (m->wall->type == SURFACE_WIDE_WALLKICK) ? 0x6001 : 0x4001
 bne t6, t1, @normal_wall          ; |
 ori t2, r0,  0x6001               ; |
-addi t2, t2, -0x0010              ; -
+addi t2, t2, -0x2000              ; -
 @normal_wall:
 slt at, t2, t0                    ; +
 beq at, r0, 0x000114BC            ; | if (t0 > t2)
