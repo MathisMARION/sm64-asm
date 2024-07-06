@@ -4,8 +4,9 @@
 addiu sp, sp, 0xFFE8
 sw ra, 0x14(sp)
 ; Call to our custom function
+lui a2, 0x701C
 jal 0x80406000
-nop
+ori a2, a2, 0x0F00
 lw ra, 0x14(sp)
 jr ra
 addiu sp, sp, 0x18
@@ -34,13 +35,9 @@ andi t0, t0, 0x0080
 bne t0, r0, airborne
 
 ; Set Mario's shoe color to dark cyan
-lui t5, 0x8008
-lui t0, 0x0055
-ori t0, t0, 0x5500
-sw t0, 0xEC68(t5)
-sw t0, 0xEC6C(t5)
-sw t0, 0xEC70(t5)
-sw t0, 0xEC74(t5)
+lui a2, 0x0055
+jal 0x8040614C-0x30
+ori a2, a2, 0x5500
 
 ; Save 1 to marioObj.unused2 (offset 0x210)
 ; to enable the double jump ability
@@ -55,13 +52,9 @@ lb t0, 0x210(t7)
 beq t0, r0, skip
 
 ; Set Mario's shoe color to dark cyan
-lui t5, 0x8008
-lui t0, 0x0055
-ori t0, t0, 0x5500
-sw t0, 0xEC68(t5)
-sw t0, 0xEC6C(t5)
-sw t0, 0xEC70(t5)
-sw t0, 0xEC74(t5)
+lui a2, 0x0055
+jal 0x8040614C-0x30
+ori a2, a2, 0x5500
 
 ; Check if state is ACT_TRIPLE_JUMP (0x01000882)
 lui t0, 0x0100
@@ -110,13 +103,9 @@ nop
 checkA:
 
 ; Set Mario's shoe color to cyan
-lui t5, 0x8008
-lui t0, 0x00FF
-ori t0, t0, 0xFF00
-sw t0, 0xEC68(t5)
-sw t0, 0xEC6C(t5)
-sw t0, 0xEC70(t5)
-sw t0, 0xEC74(t5)
+lui a2, 0x00FF
+jal 0x8040614C-0x30
+ori a2, a2, 0xFF00
 
 ; Load buttons pressed on the current frame
 ; &controller.buttonPressed = 0x8033AF90 + 0x12 = 0x8033AFA2
@@ -132,13 +121,9 @@ nop
 sh r0, 0x210(t7)
 
 ; Set Mario's shoe color to default
-lui t5, 0x8008
-lui t0, 0x701C
-ori t0, t0, 0x0F00
-sw t0, 0xEC68(t5)
-sw t0, 0xEC6C(t5)
-sw t0, 0xEC70(t5)
-sw t0, 0xEC74(t5)
+lui a2, 0x701C
+jal 0x8040614C-0x30
+ori a2, a2, 0x0F00
 
 ; Set Mario's state to a jump
 ; arg0 is a pointer to the Mario struct (0x8033B170)
@@ -157,3 +142,13 @@ lw ra, 0x14(sp)
 jr ra
 addiu sp, sp, 0x18
 ; --------------------------
+
+.orga 0x0120614C-0x30
+li t0, 0x80000000
+lw t5, 0x8033b410
+or t5, t5, t0
+sw a2, (0xEC68 - 0xEC20)(t5)
+sw a2, (0xEC6C - 0xEC20)(t5)
+sw a2, (0xEC70 - 0xEC20)(t5)
+jr ra
+sw a2, (0xEC74 - 0xEC20)(t5)
