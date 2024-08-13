@@ -149,9 +149,13 @@ addiu sp, sp, 0x18
 
 ; Small routine, color is passed in a2 and a3 as 0xRRGGBB00
 set_shoe_color:
-lui t5, 0x8008
+; ROM Manager may decide to relocate bank 4, so the shoe color is not always at
+; the same place. Inlined version of get_segment_base_addr(4):
+li at, 0x80000000
+lw v0, 0x8033b400 + 4 * 0x04
+or v0, at
 ; *(uint32_t *)mario_brown1_lights_group.a.col = color_ambiant;
-sw a2, 0xec68(t5)
+sw a2, 0x48(v0)
 jr ra
 ; *(uint32_t *)mario_brown1_lights_group.l[0].col = color_light;
-sw a3, 0xec70(t5)
+sw a3, 0x50(v0)
