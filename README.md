@@ -14,6 +14,9 @@ help understanding and allow for modifications, do not hesitate to take a read.
 
 ## Custom Mechanics
 
+- `bonk_wallkick_wall`: A custom wall type that allows to wallkick even with a
+  hard bonk (eg. from a dive). Note that this does not work with ceilings
+  (collision ID `6`).
 - `double_jump`: Code for a midair double jump, and a crystal that gives you
   back your ability midair (Celeste style)
 - `firsty_wall`: A custom wall type that always gives a firsty when wallkicked,
